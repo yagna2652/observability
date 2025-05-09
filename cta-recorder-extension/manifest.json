@@ -1,0 +1,17 @@
+{
+  "manifest_version": 3,
+  "name": "CTA Recorder",
+  "version": "1.0",
+  "permissions": ["scripting", "activeTab"],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "CTA Recorder"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["rrweb.min.js", "contentScript.js"],
+      "run_at": "document_idle"
+    }
+  ]
+} 
