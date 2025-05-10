@@ -2,10 +2,13 @@
   "manifest_version": 3,
   "name": "CTA Recorder",
   "version": "1.0",
-  "permissions": ["scripting", "activeTab"],
+  "permissions": ["scripting", "activeTab", "downloads"],
   "action": {
     "default_popup": "popup.html",
     "default_title": "CTA Recorder"
+  },
+  "background": {
+    "service_worker": "background.js"
   },
   "content_scripts": [
     {

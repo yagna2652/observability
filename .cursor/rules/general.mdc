@@ -1,0 +1,71 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+ * 🧠 Cursor Prompt: Code Rules for Browser Automation MVP
+ * 
+ * 🎯 Project Overview:
+ * This project evaluates the automation feasibility of browser-based workflows by:
+ *   1. Recording user actions with rrweb + DOM selectors
+ *   2. Replaying the session in a Browserbase sandbox via Stagehand
+ *   3. Validating replay output against saved expectations
+ *   4. Classifying the task as Automatable, Partially Automatable, or Non-Automatable
+ * 
+ * -----------------------------------------------------
+ * 🧱 Architecture Principles:
+ * - All logic is modularized into:
+ *   - `/recorder/` (capture user interactions)
+ *   - `/replayer/` (simulate recorded actions)
+ *   - `/automation/` (feasibility analysis, heuristics, parameter injection)
+ *   - `/data/` (saved JSON logs and expected HTML DOMs)
+ * 
+ * -----------------------------------------------------
+ * 🧾 Code and Folder Structure:
+ * - Use `camelCase` for variables and `kebab-case` for directories.
+ * - Each file should export a single, focused function.
+ * - Type everything using TypeScript (no `any`).
+ * - Zod is the preferred validator for runtime shape checking.
+ * - Avoid circular imports — use dependency inversion if needed.
+ * 
+ * -----------------------------------------------------
+ * 🧠 Development Guidelines:
+ * - Treat `index.ts` as the orchestrator, not a logic holder.
+ * - Separate I/O (file read/write, downloads) from logic (diffs, decisions).
+ * - Prefer `async/await`, avoid nested `.then()` chains.
+ * - Favor immutability and early returns for clarity.
+ * 
+ * -----------------------------------------------------
+ * 📂 Downloads and Session Logs:
+ * - Save `.json` files using `chrome.downloads.download()` into `recordings/`.
+ * - Use timestamp-based filenames: `recording-YYYY-MM-DDTHH-MM-SS.json`.
+ * - Normalize session logs before reusing them in replay or classification.
+ * 
+ * -----------------------------------------------------
+ * ⚙️ Stagehand Integration:
+ * - Actions derived from `actionEvents` must be compiled to:
+ *     - `await stagehand.act({ click: selector })`
+ *     - `await stagehand.act({ input: { selector, value } })`
+ *     - `await stagehand.scroll({ selector, y })`
+ *     - `await stagehand.pressEnter({ selector })`
+ * - DOM snapshots are read with `page.content()`
+ * 
+ * -----------------------------------------------------
+ * 🧪 Validation:
+ * - Use `diffLines()` from `diff` package for DOM comparison.
+ * - If `hasDiff || errors.length > 0`, classify as Not Fully Automatable.
+ * - Validate structure of saved `.json` files before use.
+ * 
+ * -----------------------------------------------------
+ * 🌐 Extension Behavior:
+ * - `contentScript.js` records `rrwebEvents` and `actionEvents`.
+ * - Replace `a.click()` with `chrome.downloads.download()` to fix file path.
+ * - Use `generateSelector(el)` with guards to prevent undefined `el.tagName` crash.
+ * 
+ * -----------------------------------------------------
+ * 💡 Example Prompts:
+ * - "Compile this `actionEvents` array into a replayable Stagehand script."
+ * - "Fix download logic to save .json in a subfolder with controlled filename."
+ * - "Classify this diff result using the feasibility heuristics."
+ * - "Make the recording script resilient to invalid DOM targets."
+ */

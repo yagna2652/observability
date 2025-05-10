@@ -3,20 +3,19 @@ let rrwebEvents = [];
 let actionEvents = [];
 
 function generateSelector(el) {
-  if (!el || !el.tagName) return '';
+  if (!el || !el.tagName || typeof el.tagName.toLowerCase !== 'function') return '';
   if (el.id) return `#${el.id}`;
   return el.tagName.toLowerCase() + (el.className ? '.' + el.className.split(' ').join('.') : '');
 }
 
 function recordAction(type, el, extra = {}) {
-  if (!el || !el.tagName) return; // Only record if el is a valid element
-  const selector = generateSelector(el);
-  actionEvents.push({
-    type,
-    selector,
-    timestamp: Date.now(),
-    ...extra
-  });
+  try {
+    if (!el || !el.tagName || typeof el.tagName !== 'string') return;
+    const selector = generateSelector(el);
+    actionEvents.push({ type, selector, timestamp: Date.now(), ...extra });
+  } catch (err) {
+    console.warn('[Recorder] Error recording action:', err);
+  }
 }
 
 window.addEventListener("START_RECORDING", () => {
@@ -56,7 +55,6 @@ window.addEventListener("STOP_RECORDING", () => {
   console.log("[Recorder] rrweb session:", rrwebEvents);
   console.log("[Recorder] action events:", actionEvents);
 
-  // Save recording as a downloadable file
   const recording = {
     rrwebEvents,
     actionEvents,
@@ -67,13 +65,9 @@ window.addEventListener("STOP_RECORDING", () => {
     }
   };
 
-  const blob = new Blob([JSON.stringify(recording, null, 2)], { type: "application/json" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = `recording-${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.json`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
+  console.log("[Recorder] Sending SAVE_RECORDING message to background", recording);
+  chrome.runtime.sendMessage({
+    type: "SAVE_RECORDING",
+    data: recording
+  });
 }); 
